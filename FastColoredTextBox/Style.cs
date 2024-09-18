@@ -2,6 +2,7 @@
 using System;
 using System.Drawing.Drawing2D;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace FastColoredTextBoxNS
 {
@@ -56,9 +57,11 @@ namespace FastColoredTextBoxNS
 
     public static Size GetSizeOfRange (Range range)
     {
+      Line line = range.tb[range.Start.iLine];
+
       int x = 0;
-      for (int i = range.Start.iChar; i < range.End.iChar; i++)
-        if (TextStyle.IsCJKCharacter (range.tb.Lines[range.Start.iLine][i]))
+      for (int i = range.Start.iChar; i < range.End.iChar && i < line.Count; i++)
+        if (TextStyle.IsCJKCharacter (line[i].c))
           x += 2 * range.tb.CharWidth;
         else
           x += range.tb.CharWidth;
@@ -126,12 +129,16 @@ namespace FastColoredTextBoxNS
 
     public override void Draw (Graphics gr, Point position, Range range)
     {
+      Line line;
+
       //draw background
       if (BackgroundBrush != null)
       {
+        line = range.tb[range.Start.iLine];
+
         int x = 0;
-        for (int i = range.Start.iChar; i <= range.End.iChar; i++)
-          if (IsCJKCharacter (range.tb.Lines[range.Start.iLine][i]))
+        for (int i = range.Start.iChar; i < range.End.iChar && i < line.Count; i++)
+          if (IsCJKCharacter (line[i].c))
             x += 2 * range.tb.CharWidth;
           else
             x += range.tb.CharWidth;
@@ -142,7 +149,7 @@ namespace FastColoredTextBoxNS
       //draw chars
       using (var f = new Font (range.tb.Font, FontStyle))
       {
-        Line line = range.tb[range.Start.iLine];
+        line = range.tb[range.Start.iLine];
         float dx = range.tb.CharWidth;
         float y = position.Y + range.tb.LineInterval/2;
         float x = position.X - range.tb.CharWidth/3;
@@ -153,7 +160,7 @@ namespace FastColoredTextBoxNS
         if (/*range.tb.ImeAllowed*/true)
         {
           //IME mode
-          for (int i = range.Start.iChar; i < range.End.iChar; i++)
+          for (int i = range.Start.iChar; i < range.End.iChar && i < line.Count; i++)
           {
             if (IsCJKCharacter (line[i].c))
             {
@@ -167,7 +174,8 @@ namespace FastColoredTextBoxNS
               //gr.Restore (gs);
               //x += dx;
               gr.DrawString (line[i].c.ToString (), f, ForeBrush, x, y, stringFormat);
-              x += 2 * range.tb.CharWidth;
+              //x += 2 * range.tb.CharWidth;
+              x += GetCharacterWidth (gr, f, line[i].c, range.tb.CharWidth);
             }
             else
             {
@@ -273,12 +281,28 @@ namespace FastColoredTextBoxNS
       if (codePoint >= 0xAC00 && codePoint <= 0xD7AF) 
         return true;
 
+      // half-size Katakana
+      if (codePoint >= 0xFF65 && codePoint <= 0xFF9F)
+        return false;
+
       // Halfwidth and Fullwidth Forms (for compatibility)
       if (codePoint >= 0xFF00 && codePoint <= 0xFFEF) 
         return true;
 
       return false;
     }
+
+    public static int GetCharacterWidth (Graphics gr, Font fnt, char c, int def_char_width)
+    {
+      TextFormatFlags flags = TextFormatFlags.NoPadding;
+      Size max_size = new Size (int.MaxValue, int.MaxValue);
+      int width = TextRenderer.MeasureText (gr, c.ToString (), fnt, max_size, flags).Width + 3;
+
+      if (width < def_char_width)
+        return def_char_width;
+      else
+        return width;
+    } // GetCharacterWidth
 
     public override string GetCSS ()
     {
@@ -343,6 +367,8 @@ namespace FastColoredTextBoxNS
 
     public override void Draw (Graphics gr, Point position, Range range)
     {
+      Line line;
+
       if (range.End.iChar > range.Start.iChar)
       {
         base.Draw (gr, position, range);
@@ -351,19 +377,20 @@ namespace FastColoredTextBoxNS
         int x = position.X;
 
         //find first non space symbol
-        for (int i = range.Start.iChar; i < range.End.iChar; i++)
-          if (range.tb[range.Start.iLine][i].c != ' ')
+        line = range.tb[range.Start.iLine];
+        for (int i = range.Start.iChar; i < range.End.iChar && i < line.Count; i++)
+          if (line[i].c != ' ')
             break;
           else
           {
-            if (IsCJKCharacter (range.tb[range.Start.iLine][i].c))
+            if (IsCJKCharacter (line[i].c))
               firstNonSpaceSymbolX += 2 * range.tb.CharWidth;
             else
               firstNonSpaceSymbolX += range.tb.CharWidth;
           }
 
-        for (int i = range.Start.iChar; i < range.End.iChar; i++)
-          if (IsCJKCharacter (range.tb[range.Start.iLine][i].c))
+        for (int i = range.Start.iChar; i < range.End.iChar && i < line.Count; i++)
+          if (IsCJKCharacter (line[i].c))
             x += 2 * range.tb.CharWidth;
           else
             x += range.tb.CharWidth;
@@ -407,15 +434,20 @@ namespace FastColoredTextBoxNS
 
     public override void Draw (Graphics gr, Point position, Range range)
     {
+      Line line;
+      int x;
+
       if (range.Start.iChar == range.End.iChar)
         return;
 
       //draw background
       if (BackgroundBrush != null)
       {
-        int x = 0;
-        for (int i = range.Start.iChar; i < range.End.iChar; i++)
-          if (TextStyle.IsCJKCharacter (range.tb[range.Start.iLine][i].c))
+        line = range.tb[range.Start.iLine];
+
+        x = 0;
+        for (int i = range.Start.iChar; i < range.End.iChar && i < line.Count; i++)
+          if (TextStyle.IsCJKCharacter (line[i].c))
             x += 2 * range.tb.CharWidth;
           else
             x += range.tb.CharWidth;
@@ -456,12 +488,16 @@ namespace FastColoredTextBoxNS
 
     public override void Draw (Graphics gr, Point position, Range range)
     {
+      Line line;
+
       //draw background
       if (BackgroundBrush != null)
       {
+        line = range.tb[range.Start.iLine];
+
         int x = 0;
-        for (int i = range.Start.iChar; i < range.End.iChar; i++)
-          if (TextStyle.IsCJKCharacter (range.tb[range.Start.iLine][i].c))
+        for (int i = range.Start.iChar; i < range.End.iChar && i < line.Count; i++)
+          if (TextStyle.IsCJKCharacter (line[i].c))
             x += 2 * range.tb.CharWidth;
           else
             x += range.tb.CharWidth;

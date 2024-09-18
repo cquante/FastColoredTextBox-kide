@@ -6382,6 +6382,7 @@ namespace FastColoredTextBoxNS
     {
       int p, x = 0, y;
       int iWordWrapIndex;
+      Line line;
 
       if (place.iLine >= LineInfos.Count)
         return new Point ();
@@ -6395,9 +6396,10 @@ namespace FastColoredTextBoxNS
       if (iWordWrapIndex > 0)
         p += LineInfos[place.iLine].wordWrapIndent;
 
-      for (int i = 0; i < p; i++)
+      line = lines[place.iLine];
+      for (int i = 0; i < p && i < line.Count; i++)
       {
-        if (TextStyle.IsCJKCharacter (lines[place.iLine][i].c))
+        if (TextStyle.IsCJKCharacter (line[i].c))
           x += 2 * CharWidth;
         else
           x += CharWidth;
