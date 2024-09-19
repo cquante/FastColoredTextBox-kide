@@ -174,8 +174,8 @@ namespace FastColoredTextBoxNS
               //gr.Restore (gs);
               //x += dx;
               gr.DrawString (line[i].c.ToString (), f, ForeBrush, x, y, stringFormat);
-              //x += 2 * range.tb.CharWidth;
-              x += GetCharacterWidth (gr, f, line[i].c, range.tb.CharWidth);
+              x += 2 * range.tb.CharWidth;
+              //x += GetCharacterWidth (gr, f, line[i].c, range.tb.CharWidth);
             }
             else
             {
