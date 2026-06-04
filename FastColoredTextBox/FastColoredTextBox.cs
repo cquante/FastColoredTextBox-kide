@@ -10,6 +10,15 @@
 //
 //  Copyright (C) Pavel Torgashov, 2011-2016. 
 
+//
+//  ---------------------------------------------------------------------------
+//  Modified for the Kawasaki IDE (K-IDE), 2024-09-17..18:
+//    reworked CJK (Chinese/Japanese/Korean) character handling and related fixes.
+//  Still licensed under the GNU Lesser General Public License (LGPLv3).
+//  Corresponding modified-library source:
+//    https://github.com/cquante/FastColoredTextBox-kide
+//  ---------------------------------------------------------------------------
+
 // #define debug
 
 // -------------------------------------------------------------------------------

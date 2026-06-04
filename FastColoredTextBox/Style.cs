@@ -1,4 +1,19 @@
-﻿using System.Drawing;
+﻿//
+//  THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
+//  KIND, EITHER EXPRESSED OR IMPLIED.
+//
+//  License: GNU Lesser General Public License (LGPLv3)
+//  Copyright (C) Pavel Torgashov, 2011-2016.
+//
+//  ---------------------------------------------------------------------------
+//  Modified for the Kawasaki IDE (K-IDE), 2024-09-19:
+//    style changes related to CJK character rendering.
+//  Corresponding modified-library source:
+//    https://github.com/cquante/FastColoredTextBox-kide
+//  ---------------------------------------------------------------------------
+//
+
+using System.Drawing;
 using System;
 using System.Drawing.Drawing2D;
 using System.Collections.Generic;
