@@ -9,7 +9,7 @@
 //  Modified for the Kawasaki IDE (K-IDE), 2026-09-11:
 //    Redo now handles a cancelled edit the same way ExecuteCommand does.
 //  Corresponding modified-library source:
-//    https://github.com/cquante/FastColoredTextBox-kide
+//    https://github.com/KawasakiRoboticsGmbH/FastColoredTextBox-kide
 //  ---------------------------------------------------------------------------
 //
 

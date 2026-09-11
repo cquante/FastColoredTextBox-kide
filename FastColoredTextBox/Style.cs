@@ -9,7 +9,7 @@
 //  Modified for the Kawasaki IDE (K-IDE), 2024-09-19:
 //    style changes related to CJK character rendering.
 //  Corresponding modified-library source:
-//    https://github.com/cquante/FastColoredTextBox-kide
+//    https://github.com/KawasakiRoboticsGmbH/FastColoredTextBox-kide
 //  ---------------------------------------------------------------------------
 //
 

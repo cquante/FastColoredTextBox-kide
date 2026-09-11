@@ -16,7 +16,7 @@
 //    reworked CJK (Chinese/Japanese/Korean) character handling and related fixes.
 //  Still licensed under the GNU Lesser General Public License (LGPLv3).
 //  Corresponding modified-library source:
-//    https://github.com/cquante/FastColoredTextBox-kide
+//    https://github.com/KawasakiRoboticsGmbH/FastColoredTextBox-kide
 //  ---------------------------------------------------------------------------
 
 // #define debug
