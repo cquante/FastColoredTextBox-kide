@@ -1,4 +1,19 @@
-﻿using System.Collections.Generic;
+﻿//
+//  THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY
+//  KIND, EITHER EXPRESSED OR IMPLIED.
+//
+//  License: GNU Lesser General Public License (LGPLv3)
+//  Copyright (C) Pavel Torgashov, 2011-2016.
+//
+//  ---------------------------------------------------------------------------
+//  Modified for the Kawasaki IDE (K-IDE), 2026-09-11:
+//    Redo now handles a cancelled edit the same way ExecuteCommand does.
+//  Corresponding modified-library source:
+//    https://github.com/cquante/FastColoredTextBox-kide
+//  ---------------------------------------------------------------------------
+//
+
+using System.Collections.Generic;
 using System;
 
 namespace FastColoredTextBoxNS
@@ -126,7 +141,8 @@ namespace FastColoredTextBoxNS
         {
             if (redoStack.Count == 0)
                 return;
-            UndoableCommand cmd;
+            UndoableCommand cmd = null;
+            bool cancelled = false;
             BeginDisableCommands();//prevent text changing into handlers
             try
             {
@@ -138,6 +154,16 @@ namespace FastColoredTextBoxNS
                 cmd.Execute();
                 history.Push(cmd);
             }
+            catch (ArgumentOutOfRangeException)
+            {
+                //OnTextChanging cancels the redo of the text, same as in ExecuteCommand.
+                //A cancelled command changed nothing, so it is not pushed onto the history:
+                //it is off both stacks now, which is what ExecuteCommand's history.Pop() does
+                //on the other path. Without this the refusal leaves Redo() uncaught and ends
+                //up in OnKeyDown - a background thread would take the process down, and on the
+                //UI thread it is the unhandled-exception dialog the user sees.
+                cancelled = true;
+            }
             finally
             {
                 EndDisableCommands();
@@ -147,7 +173,9 @@ namespace FastColoredTextBoxNS
             RedoCompleted(this, EventArgs.Empty);
 
             //redo command after autoUndoable command
-            if (cmd.autoUndo)
+            //Not after a cancelled one: the chain's later links were recorded against the
+            //state this command would have produced, and it did not produce it.
+            if (!cancelled && cmd.autoUndo)
                 Redo();
 
             TextSource.CurrentTB.OnUndoRedoStateChanged();
